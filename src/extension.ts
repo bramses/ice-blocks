@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as firebase from './firebase';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -18,6 +19,10 @@ export function activate(context: vscode.ExtensionContext) {
 		// Display a message box to the user
 		vscode.window.showInformationMessage('Hello World from ice-blocks!');
 	});
+
+	// firebase.addCodeBlock("console.log('Hello World 2')", "javascript", "Hello World 2", ["https://www.google.com/1"]).then((res:any) => {
+    // 	console.log(res);
+	// });
 
 	context.subscriptions.push(disposable);
 
