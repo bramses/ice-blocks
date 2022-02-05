@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 				'catCoding', // Identifies the type of the webview. Used internally
 
-				'Cat Coding', // Title of the panel displayed to the user
+				'Ice Blocks', // Title of the panel displayed to the user
 
 				vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
 
@@ -51,11 +51,12 @@ export function activate(context: vscode.ExtensionContext) {
 				message => {
 				  switch (message.command) {
 					case 'alert':
-					  console.log(editor?.selection.active)
-					  vscode.window.showErrorMessage(message.text);
+					  console.log(editor?.selection.active);
+					  // vscode.window.showErrorMessage(message.text);
 					  editor?.edit(editBuilder => {
 						editBuilder.insert(editor.selection.active, message.text);
 					  });
+					  
 					  return;
 				  }
 				},
@@ -90,10 +91,8 @@ function getWebviewContent() {
 	
 	<body>
 	
-	<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="300" />
-
-	<pre><code class="language-html" id="code-block-1"> &lt;pre&gt;&lt;code class=&quot;html&quot;&gt;&amp;lt;input type=&quot;text&quot; name=&quot;test&quot; id=&quot;test&quot; value=&quot;&quot;&amp;gt;&lt;/code&gt;&lt;/pre&gt;
-	</code></pre>
+	<h1>Using highlight.js</h1>
+	<pre id="code-block-1"><code class="language-html">&lt;pre&gt;&lt;code class=&quot;html&quot;&gt;&amp;lt;input type=&quot;text&quot; name=&quot;test&quot; id=&quot;test&quot; value=&quot;&quot;&amp;gt;&lt;/code&gt;&lt;/pre&gt;</code></pre>
 
 	<script>
 	  function htmlDecode(input) {
@@ -115,7 +114,6 @@ function getWebviewContent() {
     </script>
 	
 	</body>
-	
 	</html>`;
 	
 	}
