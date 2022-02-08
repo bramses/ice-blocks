@@ -1,14 +1,12 @@
 var admin = require("firebase-admin");
 const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestore');
 var serviceAccount = require("./iceblocks-service-acct.json");
-console.log('firebase');
-console.log(serviceAccount);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
-const db = getFirestore();
+export const db = getFirestore();
 
 export const addCodeBlock = async (code: string, language: string, title = "Untitled", urls: string[] = []) => {
     
