@@ -41,3 +41,29 @@ export const addCodeBlock = async (code: string, language: string, title = "Unti
         };
     }
 };
+
+export const findCodeBlock = async (language: string) => {
+    try {
+        if (!language) {
+            return {
+                error: "No language provided"
+            };
+        }
+
+        const codeBlocks: any[] = [];
+        let docRef = db.collection('codeblocks').where('language', '==', language);
+        return docRef.get()
+        .then((querySnapshot: any) => {
+            querySnapshot.forEach((doc: any) => {
+                // doc.data() is never undefined for query doc snapshots
+                console.log(doc.id, " => ", doc.data());
+                codeBlocks.push(doc.data());
+            });
+            return codeBlocks;
+        });
+    } catch (err) {
+        return {
+            error: err
+        };
+    }
+};

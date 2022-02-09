@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ice Blocks</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/go.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+    <script>
+
+        const codeBlocks = {codeblocks}
+        console.log(codeBlocks[0])
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function htmlDecode(input) {
+            var doc = new DOMParser().parseFromString(input, "text/html");
+            return doc.documentElement.textContent;
+        }
+
+        function chooseLanguage(language) {
+            switch (language) {
+                case 'bash':
+                    return 'language-bash';
+                case 'css':
+                    return 'language-css';
+                case 'html':
+                    return 'language-html';
+                case 'javascript':
+                    return 'language-javascript';
+                case 'typescript':
+                    return 'language-typescrit';
+                case 'json':
+                    return 'language-json';
+                case 'python':
+                    return 'language-python';
+                default:
+                    return 'language-plaintext';
+            }
+        }
+
+        const vscode = acquireVsCodeApi();
+
+        function sendToVSC(code) {
+            
+            console.log(code);
+            vscode.postMessage({
+                command: 'alert',
+                text: code
+            });
+        }
+
+        function generateCodeBlock(language, code, title, terminalCommand = null) {
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML += `<h2>${title}</h2>`;
+
+            const codeBlock = document.createElement('pre');
+            if (language === 'html') {
+                code = escapeHtml(code);
+                codeBlock.innerHTML = `<code class="${chooseLanguage(language)}">${code}</code>`;
+                codeBlock.addEventListener('click', () => {
+                    sendToVSC(htmlDecode(code))
+                });
+            } else {
+                codeBlock.innerHTML = `<code class="${chooseLanguage(language)}">${code}</code>`;
+                codeBlock.addEventListener('click', () => {
+                    sendToVSC(code);
+                });
+            }
+            wrapper.appendChild(codeBlock);
+
+            if (terminalCommand) {
+                const header = document.createElement('h3');
+                header.innerText = 'Terminal Command';
+                wrapper.appendChild(header);
+                const terminalBlock = document.createElement('pre');
+                terminalBlock.innerHTML = `<code class="language-bash">${terminalCommand}</code>`;
+                wrapper.appendChild(terminalBlock);
+            }
+
+            return wrapper;
+        }
+
+        function generateCodeBlocks() {
+            codeBlocks.forEach(codeBlock => {
+                const codeBlockElement = generateCodeBlock(codeBlock.language, codeBlock.code, codeBlock.title, codeBlock.terminalCommand);
+                document.body.appendChild(codeBlockElement);
+            });
+        }
+
+        generateCodeBlocks();
+
+    </script>
+</body>
+
+</html>

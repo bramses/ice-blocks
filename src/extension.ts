@@ -1,22 +1,12 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as firebase from './firebase';
+import { readFile } from './localFileHandler';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "ice-blocks" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('ice-blocks.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
 		vscode.window.showInformationMessage('Hello World from ice-blocks!');
 	});
 
@@ -24,11 +14,13 @@ export function activate(context: vscode.ExtensionContext) {
     // 	console.log(res);
 	// });
 
+	const codeBlocks = await firebase.findCodeBlock('javascript');
+
 	context.subscriptions.push(disposable);
 
 	context.subscriptions.push(
 
-		vscode.commands.registerCommand('iceBlocks.open', () => {
+		vscode.commands.registerCommand('iceBlocks.open', async () => {
 
 			const editor = vscode.window.activeTextEditor;
 
@@ -37,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const panel = vscode.window.createWebviewPanel(
 
-				'catCoding', // Identifies the type of the webview. Used internally
+				'iceBlocks', // Identifies the type of the webview. Used internally
 
 				'Ice Blocks', // Title of the panel displayed to the user
 
@@ -49,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			);
 
-			panel.webview.html = getWebviewContent();
+			panel.webview.html = await getWebviewContent(codeBlocks);
 
 			// Handle messages from the webview
 			panel.webview.onDidReceiveMessage(
@@ -73,55 +65,50 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 }
 
-function getWebviewContent() {
+const codeBlocksExamples = [
+	{
+		id: 'code-block-1',
+		terminalCommand: 'npm i dotenv',
+		code: `const dotenv = require('dotenv');
+dotenv.config();
 
-	return `<!DOCTYPE html>
-	
-	<html lang="en">
-	
-	<head>
-	
-	<meta charset="UTF-8">
-	
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	
-	<title>Cat Coding</title>
+console.log(process.env.DB_HOST);`,
+		language: 'javascript',
+		title: 'Using dotenv'
+	},
+	{
+		language: 'python',
+		title: 'Using pandas',
+		code: `import pandas as pd
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
-	<!-- and it's easy to individually load additional languages -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/go.min.js"></script>
-	<script>hljs.highlightAll();</script>
-	</head>
-	
-	<body>
-	
-	<h1>Using highlight.js</h1>
-	<pre id="code-block-1"><code class="language-html">&lt;pre&gt;&lt;code class=&quot;html&quot;&gt;&amp;lt;input type=&quot;text&quot; name=&quot;test&quot; id=&quot;test&quot; value=&quot;&quot;&amp;gt;&lt;/code&gt;&lt;/pre&gt;</code></pre>
+df = pd.read_csv('data.csv')
+df.head()
 
-	<script>
-	  function htmlDecode(input) {
-		var doc = new DOMParser().parseFromString(input, "text/html");
-		return doc.documentElement.textContent;
-	  }
-
-        (function() {
-            const vscode = acquireVsCodeApi();
-            const counter = document.getElementById('code-block-1');
-
-			counter.addEventListener('click', () => {
-				vscode.postMessage({
-					command: 'alert',
-					text: htmlDecode(counter.innerText)
-				});
-			});
-        }())
-    </script>
-	
-	</body>
-	</html>`;
-	
+def get_data(df):
+return df.head()
+`,
+		terminalCommand: 'pip install pandas',
+		id: 'code-block-2'
+	},
+	{
+		language: 'html',
+		title: 'Using highlight.js',
+		code: `<div class="hljs">
+<pre>
+<code class="language-html">test</code>
+</pre>`,
+		id: 'code-block-3'
 	}
+]
+
+async function getWebviewContent(codeBlocks: any[] = codeBlocksExamples) {
+	let htmlStr = await readFile('../src/index.html');
+	htmlStr = htmlStr.replace('{codeblocks}', JSON.stringify(codeBlocks));
+
+	console.log(htmlStr);
+
+	return htmlStr;
+}
 
 // this method is called when your extension is deactivated
 export function deactivate() { 
