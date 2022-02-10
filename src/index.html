@@ -69,9 +69,9 @@
             });
         }
 
-        function generateCodeBlock(language, code, title, terminalCommand = null) {
+        function generateCodeBlock(language, code, title, terminalCommand = null, urls = null) {
             const wrapper = document.createElement('div');
-            wrapper.innerHTML += `<h2>${title}</h2>`;
+            wrapper.innerHTML += `<h1>${title}</h1>`;
 
             const codeBlock = document.createElement('pre');
             if (language === 'html') {
@@ -90,11 +90,26 @@
 
             if (terminalCommand) {
                 const header = document.createElement('h3');
-                header.innerText = 'Terminal Command';
+                header.innerText = 'Companion Terminal Command';
                 wrapper.appendChild(header);
                 const terminalBlock = document.createElement('pre');
                 terminalBlock.innerHTML = `<code class="language-bash">${terminalCommand}</code>`;
                 wrapper.appendChild(terminalBlock);
+            }
+
+            if (urls) {
+                console.log(urls);
+                const header = document.createElement('h3');
+                header.innerText = 'Companion URLs';
+                wrapper.appendChild(header);
+                const urlsBlock = document.createElement('ul');
+                urls.forEach(url => {
+                    const urlBlock = document.createElement('li');
+                    urlBlock.innerHTML = `<a href="${url}">${url}</a>`;
+                    urlsBlock.appendChild(urlBlock);
+                });
+
+                wrapper.appendChild(urlsBlock);
             }
 
             return wrapper;
@@ -102,7 +117,7 @@
 
         function generateCodeBlocks() {
             codeBlocks.forEach(codeBlock => {
-                const codeBlockElement = generateCodeBlock(codeBlock.language, codeBlock.code, codeBlock.title, codeBlock.terminalCommand);
+                const codeBlockElement = generateCodeBlock(codeBlock.language, codeBlock.code, codeBlock.title, codeBlock.terminalCommand, codeBlock.urls);
                 document.body.appendChild(codeBlockElement);
             });
         }

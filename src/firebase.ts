@@ -8,7 +8,7 @@ admin.initializeApp({
 
 export const db = getFirestore();
 
-export const addCodeBlock = async (code: string, language: string, title = "Untitled", urls: string[] = []) => {
+export const addCodeBlock = async (code: string, language: string, title: string, urls: string[] = [], terminalCommand: string | null = null) => {
     
     try {
         if (!code) {
@@ -22,17 +22,24 @@ export const addCodeBlock = async (code: string, language: string, title = "Unti
                 error: "No language provided"
             };
         }
+
+        if (!title) {
+            return {
+                error: "No title provided"
+            };
+        }
         
         let docRef;
         
-        if (title) {docRef = db.collection('codeblocks').doc(title);}
-        else {docRef = db.collection('codeblocks').doc();}
+        docRef = db.collection('codeblocks').doc(title);
+        
     
         return docRef.set({
             code,
             language,
             title,
             urls,
+            terminalCommand,
             createdAt: FieldValue.serverTimestamp()
         });
     } catch (err) {
