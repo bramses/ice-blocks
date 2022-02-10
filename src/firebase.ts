@@ -6,9 +6,8 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
-export const db = getFirestore();
 
-export const addCodeBlock = async (code: string, language: string, title: string, urls: string[] = [], terminalCommand: string | null = null) => {
+export const addCodeBlock = async (db: any, code: string, language: string, title: string, urls: string[] = [], terminalCommand: string | null = null) => {
     
     try {
         if (!code) {
@@ -49,7 +48,7 @@ export const addCodeBlock = async (code: string, language: string, title: string
     }
 };
 
-export const findCodeBlock = async (language: string) => {
+export const findCodeBlock = async (db: any, language: string) => {
     try {
         if (!language) {
             return {

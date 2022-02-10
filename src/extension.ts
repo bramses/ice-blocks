@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as firebase from './firebase';
 import { readFile } from './localFileHandler';
+const { getFirestore } = require('firebase-admin/firestore');
 
 
 const FILETYPES: { [key: string]: string } = {
@@ -84,6 +85,7 @@ const logic = async (editor: vscode.TextEditor | undefined) => {
 
 export async function activate(context: vscode.ExtensionContext) {
 
+
 	console.log('Congratulations, your extension "ice-blocks" is now active!');
 
 	let disposable = vscode.commands.registerCommand('ice-blocks.helloWorld', () => {
@@ -95,7 +97,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	// });
 
 	// this needed
-	const codeBlocks = await firebase.findCodeBlock('python');
+	
 
 	context.subscriptions.push(disposable);
 
@@ -119,6 +121,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 
 		vscode.commands.registerCommand('ice-blocks.open', async () => {
+
+			const db = getFirestore();
+			const codeBlocks = await firebase.findCodeBlock(db, 'python');
 
 			const editor = vscode.window.activeTextEditor;
 
