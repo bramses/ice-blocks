@@ -13,6 +13,7 @@ const FILETYPES: { [key: string]: string } = {
 	"zshrc": "bash",
 	"sh": "bash",
 	"css": "css",
+	"cs": "csharp",
 };
 
 const fbURL = vscode.workspace.getConfiguration().get('ice-blocks.fbURL');
