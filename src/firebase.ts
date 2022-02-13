@@ -8,7 +8,7 @@ admin.initializeApp({
 
 
 export const addCodeBlock = async (db: any, code: string, language: string, title: string, urls: string[] = [], terminalCommand: string | null = null) => {
-    
+    console.log(`Adding code block: ${title}`);
     try {
         if (!code) {
             return {
@@ -50,6 +50,7 @@ export const addCodeBlock = async (db: any, code: string, language: string, titl
 };
 
 export const incrementPriority = async (db: any, id: string) => {
+    console.log(`Incrementing priority for code block: ${id}`);
     try {
         const docRef = db.collection('codeblocks').doc(id);
         const doc = await docRef.get();
@@ -65,6 +66,7 @@ export const incrementPriority = async (db: any, id: string) => {
 };
 
 export const findCodeBlock = async (db: any, language: string) => {
+    console.log(`Finding code blocks for: ${language}`);
     try {
         if (!language) {
             return {

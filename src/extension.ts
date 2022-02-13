@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import * as firebase from './firebase';
-import { readFile } from './localFileHandler';
 const { getFirestore } = require('firebase-admin/firestore');
+//@ts-ignore
+import html from "./index.html";
 
 
 const FILETYPES: { [key: string]: string } = {
@@ -230,10 +231,17 @@ return df.head()
 ];
 
 async function getWebviewContent(codeBlocks: any[] = codeBlocksExamples) {
-	let htmlStr = await readFile('../src/index.html');
-	htmlStr = htmlStr.replace('{codeblocks}', JSON.stringify(codeBlocks));
+	try {
+		// https://onlinejsontools.com/stringify-json
+		let htmlStr = "<!DOCTYPE html>\n\n<html lang=\"en\">\n\n<head>\n\n    <meta charset=\"UTF-8\">\n\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\n    <title>Ice Blocks</title>\n\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css\">\n    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js\"></script>\n    <!-- and it's easy to individually load additional languages -->\n    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/typescript.min.js\"></script>\n    <script>hljs.highlightAll();</script>\n</head>\n\n<body>\n    <script>\n\n        const codeBlocks = {codeblocks}\n        console.log(codeBlocks[0])\n\n        function escapeHtml(unsafe) {\n            return unsafe\n                .replace(/&/g, \"&amp;\")\n                .replace(/</g, \"&lt;\")\n                .replace(/>/g, \"&gt;\")\n                .replace(/\"/g, \"&quot;\")\n                .replace(/'/g, \"&#039;\");\n        }\n\n        function htmlDecode(input) {\n            var doc = new DOMParser().parseFromString(input, \"text/html\");\n            return doc.documentElement.textContent;\n        }\n\n        function chooseLanguage(language) {\n            switch (language) {\n                case 'bash':\n                    return 'language-bash';\n                case 'css':\n                    return 'language-css';\n                case 'html':\n                    return 'language-html';\n                case 'javascript':\n                    return 'language-javascript';\n                case 'typescript':\n                    return 'language-typescript';\n                case 'json':\n                    return 'language-json';\n                case 'python':\n                    return 'language-python';\n                default:\n                    return 'language-plaintext';\n            }\n        }\n\n        const vscode = acquireVsCodeApi();\n\n        function sendToVSC(code) {\n            \n            console.log(code);\n            vscode.postMessage({\n                command: 'alert',\n                text: code.code,\n                msgId: code.id\n            });\n        }\n\n        function generateCodeBlock(language, code, title, id, terminalCommand = null, urls = null) {\n            const wrapper = document.createElement('div');\n            wrapper.innerHTML += `<h1>${title}</h1>`;\n\n            const codeBlock = document.createElement('pre');\n            if (language === 'html') {\n                code = escapeHtml(code);\n                codeBlock.innerHTML = `<code id=\"${id}\"\" class=\"${chooseLanguage(language)}\">${code}</code>`;\n                codeBlock.addEventListener('click', () => {\n                    sendToVSC({\n                        id: id,\n                        code: htmlDecode(code)\n                    })\n                });\n            } else {\n                codeBlock.innerHTML = `<code id=\"${id}\"\" class=\"${chooseLanguage(language)}\">${code}</code>`;\n                codeBlock.addEventListener('click', () => {\n                    sendToVSC({code: code, id: id});\n                });\n            }\n            wrapper.appendChild(codeBlock);\n\n            if (terminalCommand) {\n                const header = document.createElement('h3');\n                header.innerText = 'Companion Terminal Command';\n                wrapper.appendChild(header);\n                const terminalBlock = document.createElement('pre');\n                terminalBlock.innerHTML = `<code class=\"language-bash\">${terminalCommand}</code>`;\n                wrapper.appendChild(terminalBlock);\n            }\n\n            if (urls && urls.length > 0) {\n                console.log(urls);\n                const header = document.createElement('h3');\n                header.innerText = 'Companion URLs';\n                wrapper.appendChild(header);\n                const urlsBlock = document.createElement('ul');\n                urls.forEach(url => {\n                    const urlBlock = document.createElement('li');\n                    urlBlock.innerHTML = `<a href=\"${url}\">${url}</a>`;\n                    urlsBlock.appendChild(urlBlock);\n                });\n\n                wrapper.appendChild(urlsBlock);\n            }\n\n            return wrapper;\n        }\n\n        function generateCodeBlocks() {\n            codeBlocks.forEach(codeBlock => {\n                const codeBlockElement = generateCodeBlock(codeBlock.language, codeBlock.code, codeBlock.title, codeBlock.id, codeBlock.terminalCommand, codeBlock.urls);\n                document.body.appendChild(codeBlockElement);\n            });\n        }\n\n        generateCodeBlocks();\n\n    </script>\n</body>\n\n</html>";
+		htmlStr = htmlStr.replace('{codeblocks}', JSON.stringify(codeBlocks));
 
-	return htmlStr;
+		return htmlStr;
+	} catch (err) {
+		console.error(err);
+		return `err: ${err}`;
+	}
+	
 }
 
 // this method is called when your extension is deactivated

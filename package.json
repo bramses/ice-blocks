@@ -2,7 +2,15 @@
   "name": "ice-blocks",
   "displayName": "ice-blocks",
   "description": "view saved code blocks and paste them into vsc",
-  "version": "0.0.1",
+  "publisher": "sharingfiction",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bramses/ice-blocks"
+  },
+  "author": {
+    "name": "bramses"
+  },
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -70,6 +78,7 @@
     "@vscode/test-electron": "^1.6.2",
     "eslint": "^7.32.0",
     "glob": "^7.1.7",
+    "html-loader": "^3.1.0",
     "mocha": "^9.1.1",
     "ts-loader": "^9.2.5",
     "typescript": "^4.4.3",
