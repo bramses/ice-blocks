@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
     <!-- and it's easy to individually load additional languages -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/typescript.min.js"></script>
     <script>hljs.highlightAll();</script>
 </head>
 
@@ -48,7 +48,7 @@
                 case 'javascript':
                     return 'language-javascript';
                 case 'typescript':
-                    return 'language-typescrit';
+                    return 'language-typescript';
                 case 'json':
                     return 'language-json';
                 case 'python':
@@ -65,25 +65,29 @@
             console.log(code);
             vscode.postMessage({
                 command: 'alert',
-                text: code
+                text: code.code,
+                msgId: code.id
             });
         }
 
-        function generateCodeBlock(language, code, title, terminalCommand = null, urls = null) {
+        function generateCodeBlock(language, code, title, id, terminalCommand = null, urls = null) {
             const wrapper = document.createElement('div');
             wrapper.innerHTML += `<h1>${title}</h1>`;
 
             const codeBlock = document.createElement('pre');
             if (language === 'html') {
                 code = escapeHtml(code);
-                codeBlock.innerHTML = `<code class="${chooseLanguage(language)}">${code}</code>`;
+                codeBlock.innerHTML = `<code id="${id}"" class="${chooseLanguage(language)}">${code}</code>`;
                 codeBlock.addEventListener('click', () => {
-                    sendToVSC(htmlDecode(code))
+                    sendToVSC({
+                        id: id,
+                        code: htmlDecode(code)
+                    })
                 });
             } else {
-                codeBlock.innerHTML = `<code class="${chooseLanguage(language)}">${code}</code>`;
+                codeBlock.innerHTML = `<code id="${id}"" class="${chooseLanguage(language)}">${code}</code>`;
                 codeBlock.addEventListener('click', () => {
-                    sendToVSC(code);
+                    sendToVSC({code: code, id: id});
                 });
             }
             wrapper.appendChild(codeBlock);
@@ -97,7 +101,7 @@
                 wrapper.appendChild(terminalBlock);
             }
 
-            if (urls) {
+            if (urls && urls.length > 0) {
                 console.log(urls);
                 const header = document.createElement('h3');
                 header.innerText = 'Companion URLs';
@@ -117,7 +121,7 @@
 
         function generateCodeBlocks() {
             codeBlocks.forEach(codeBlock => {
-                const codeBlockElement = generateCodeBlock(codeBlock.language, codeBlock.code, codeBlock.title, codeBlock.terminalCommand, codeBlock.urls);
+                const codeBlockElement = generateCodeBlock(codeBlock.language, codeBlock.code, codeBlock.title, codeBlock.id, codeBlock.terminalCommand, codeBlock.urls);
                 document.body.appendChild(codeBlockElement);
             });
         }

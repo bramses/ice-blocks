@@ -10,17 +10,12 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:ice-blocks.helloWorld",
     "onCommand:ice-blocks.open",
     "onCommand:ice-blocks.sendToFirebase"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "ice-blocks.helloWorld",
-        "title": "Hello World"
-      },
       {
         "command": "ice-blocks.open",
         "title": "Open Ice Blocks",
@@ -38,7 +33,21 @@
           "group": "navigation"
         }
       ]
-    }
+    },
+    "configuration": [
+      {
+        "title": "Ice Blocks",
+        "description": "Frozen Code Blocks for Posterity",
+        "order": 1,
+        "properties": {
+          "ice-blocks.fbURL": {
+            "type": "string",
+            "description": "Set your URL to Firebase",
+            "editPresentation": "singlelineText"
+          }
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

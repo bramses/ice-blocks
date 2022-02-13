@@ -39,7 +39,23 @@ export const addCodeBlock = async (db: any, code: string, language: string, titl
             title,
             urls,
             terminalCommand,
-            createdAt: FieldValue.serverTimestamp()
+            createdAt: FieldValue.serverTimestamp(),
+            priority: 0
+        });
+    } catch (err) {
+        return {
+            error: err
+        };
+    }
+};
+
+export const incrementPriority = async (db: any, id: string) => {
+    try {
+        const docRef = db.collection('codeblocks').doc(id);
+        const doc = await docRef.get();
+        const priority = doc.data().priority;
+        return docRef.update({
+            priority: priority + 1
         });
     } catch (err) {
         return {
@@ -56,6 +72,8 @@ export const findCodeBlock = async (db: any, language: string) => {
             };
         }
 
+        console.log(`findCodeBlock: ${language}`);
+
         const codeBlocks: any[] = [];
         let docRef = db.collection('codeblocks').where('language', '==', language);
         return docRef.get()
@@ -63,9 +81,13 @@ export const findCodeBlock = async (db: any, language: string) => {
             querySnapshot.forEach((doc: any) => {
                 // doc.data() is never undefined for query doc snapshots
                 console.log(doc.id, " => ", doc.data());
-                codeBlocks.push(doc.data());
+                const data = doc.data();
+                data.id = doc.id;
+                codeBlocks.push(data);
             });
-            return codeBlocks;
+            return codeBlocks.sort((a: any, b: any) => {
+                return b.priority - a.priority;
+            });
         });
     } catch (err) {
         return {
